@@ -5,6 +5,54 @@ import "./App.css";
 
 const API_BASE = "http://localhost:5000";
 
+// ---------------------- LOGIN PAGE ----------------------
+function Login({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // ✅ For now: accept any username/password
+    if (username && password) {
+      onLogin(username); // set user as logged in
+    } else {
+      alert("Please enter username and password");
+    }
+  };
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1 className="title">📊 Stock Watchlist Login</h1>
+        <p className="sub">Enter any username/password to continue</p>
+      </header>
+
+      <div className="card" style={{ maxWidth:350, margin: "0 auto" }}>
+        <form className="form" onSubmit={handleSubmit}>
+          <input
+  className="input"
+  type="text"
+  placeholder="Username"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+/>
+<input
+  className="input"
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
+
+          <button className="btn" type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+// Home page
 function Home() {
   const [stocks, setStocks] = useState([]);
   const [ticker, setTicker] = useState("");
@@ -116,6 +164,13 @@ function StockDetail() {
 }
 
 export default function App() {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />

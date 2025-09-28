@@ -59,7 +59,13 @@ body{
   border-radius:20px;
   padding:20px;
 }
-
+form.form {
+  flex-direction: column;
+  align-items: stretch;
+}
+form.form .input {
+  margin-bottom: 12px;
+}
 .form{
   display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;
 }
