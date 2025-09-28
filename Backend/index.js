@@ -73,6 +73,66 @@ app.get("/api/quote/:symbol", (req, res) => {
   });
 });
 
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+let users = []; // temporary in-memory store
+
+// Register user
+app.post("/api/users/register", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password required" });
+  }
+
+  // check if user already exists
+  if (users.find(u => u.username === username)) {
+    return res.status(400).json({ error: "User already exists" });
+  }
+
+  // hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // store user
+  const user = { id: Date.now(), username, password: hashedPassword };
+  users.push(user);
+
+  res.json({ message: "User registered successfully" });
+});
+
+// Login user
+app.post("/api/users/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = users.find(u => u.username === username);
+  if (!user) return res.status(400).json({ error: "Invalid credentials" });
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
+
+  // create token
+  const token = jwt.sign({ id: user.id, username: user.username }, "secretkey", {
+    expiresIn: "1h",
+  });
+
+  res.json({ message: "Login successful", token });
+});
+
+// Protected route (profile)
+app.get("/api/users/profile", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, "secretkey");
+    res.json({ message: "Profile data", user: decoded });
+  } catch (e) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+});
+
 
 
 // Start server
