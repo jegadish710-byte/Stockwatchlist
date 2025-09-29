@@ -112,6 +112,7 @@ app.post("/api/users/login", async (req, res) => {
   if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
 
   // create token
+  
   const token = jwt.sign({ id: user.id, username: user.username }, "secretkey", {
     expiresIn: "1h",
   });
@@ -120,6 +121,7 @@ app.post("/api/users/login", async (req, res) => {
 });
 
 // Protected route (profile)
+
 app.get("/api/users/profile", (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "No token provided" });
